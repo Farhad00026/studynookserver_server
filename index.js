@@ -53,7 +53,7 @@ async function connectToMongoDB() {
             }
         });
         
-     //get api for all study rooms
+     //get api for all study 
         app.get("/study", async (req, res) => {
             try {
                 const rooms = await roomCollection.find().toArray();
