@@ -34,13 +34,29 @@ async function connectToMongoDB() {
         console.log("✅ MongoDB connected successfully");
 
         const db = client.db("studynook");
-
-        //get api for LIMIT-6 study rooms
         const roomCollection = db.collection("studynookcollection");
 
+
+     //get api for LIMIT-6 study rooms
         app.get("/study/limit", async (req, res) => {
             try {
                 const rooms = await roomCollection.find().limit(6).toArray();
+
+                res.status(200).send(rooms);
+            } catch (error) {
+                console.error("Error fetching rooms:", error);
+
+                res.status(500).send({
+                    success: false,
+                    message: "Failed to fetch study rooms",
+                });
+            }
+        });
+        
+     //get api for all study rooms
+        app.get("/study", async (req, res) => {
+            try {
+                const rooms = await roomCollection.find().toArray();
 
                 res.status(200).send(rooms);
             } catch (error) {
