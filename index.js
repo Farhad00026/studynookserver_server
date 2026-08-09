@@ -30,7 +30,7 @@ async function connectToMongoDB() {
             res.send(result);
         })
 
-        
+        ok
     } catch (err) {
         console.error("MongoDB Connection Error:", err);
     }
