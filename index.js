@@ -85,8 +85,8 @@ async function connectToMongoDB() {
                 res.status(200).json(result);
             } catch (error) {
                 console.error("Error fetching destination:", error);
-                res.status(500).json({ message: "Something went wrong" });sss
-            }
+                res.status(500).json({ message: "Something went wrong" });
+            }llll
         });
 
 
