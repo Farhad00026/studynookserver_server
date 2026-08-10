@@ -51,7 +51,7 @@ async function connectToMongoDB() {
                     message: "Failed to fetch study rooms",
                 });
             }
-        });
+        });mmm
         
      //get api for all study 
         app.get("/study", async (req, res) => {
