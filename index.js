@@ -75,7 +75,7 @@ async function connectToMongoDB() {
                 if (!ObjectId.isValid(id)) {
                     return res.status(400).json({ message: "Invalid destination id" });
                 }
-                const query = {_id: new ObjectId(id)};
+                const query = { _id: new ObjectId(id) };
                 const result = await roomCollection.findOne(query);
 
                 if (!result) {
@@ -87,7 +87,26 @@ async function connectToMongoDB() {
                 console.error("Error fetching destination:", error);
                 res.status(500).json({ message: "Something went wrong" });
             }
-        });sss
+        });
+        //POST api for all study Rooms
+        app.post("/study", async (req, res) => {
+            try {
+                const dataRoom = req.body;
+                const result = await roomCollection.insertOne(dataRoom);
+                res.status(201).send({
+                    success: true,
+                    message: "Study room added successfully",
+                    insertedId: result.insertedId,
+                });
+            } catch (error) {
+                console.error("Error adding room:", error);
+
+                res.status(500).send({
+                    success: false,
+                    message: "Failed to add study room",
+                });
+            }
+        });
 
 
     } catch (error) {
