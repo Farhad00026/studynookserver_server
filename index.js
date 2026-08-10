@@ -4,7 +4,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 
 dotenv.config();
 
@@ -37,7 +37,7 @@ async function connectToMongoDB() {
         const roomCollection = db.collection("studynookcollection");
 
 
-     //get api for LIMIT-6 study rooms
+        //GET  api for LIMIT-6 study rooms
         app.get("/study/limit", async (req, res) => {
             try {
                 const rooms = await roomCollection.find().limit(6).toArray();
@@ -51,9 +51,9 @@ async function connectToMongoDB() {
                     message: "Failed to fetch study rooms",
                 });
             }
-        });mmm
-        
-     //get api for all study 
+        });
+
+        //GET  api for all study 
         app.get("/study", async (req, res) => {
             try {
                 const rooms = await roomCollection.find().toArray();
@@ -66,6 +66,26 @@ async function connectToMongoDB() {
                     success: false,
                     message: "Failed to fetch study rooms",
                 });
+            }
+        });
+        //GET API BY ID : Single card rooms view 
+        app.get("/study/:id", async (req, res) => {
+            try {
+                const { id } = req.params;
+                if (!ObjectId.isValid(id)) {
+                    return res.status(400).json({ message: "Invalid destination id" });
+                }
+                const query = {_id: new ObjectId(id)};
+                const result = await roomCollection.findOne(query);
+
+                if (!result) {
+                    return res.status(404).json({ message: "Destination not found" });
+                }
+
+                res.status(200).json(result);
+            } catch (error) {
+                console.error("Error fetching destination:", error);
+                res.status(500).json({ message: "Something went wrong" });
             }
         });
 
