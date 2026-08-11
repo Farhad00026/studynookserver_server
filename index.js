@@ -107,6 +107,32 @@ async function connectToMongoDB() {
                 });
             }
         });
+        
+        // PATCH API : updating a destination
+        app.patch("/study/:id", async (req, res) => {
+            try {
+                const { id } = req.params;
+                const updatedData = req.body;
+
+                if (!ObjectId.isValid(id)) {
+                    return res.status(400).json({ message: "Invalid destination id" });
+                }
+
+                const result = await roomCollection.updateOne(
+                    { _id: new ObjectId(id) },
+                    { $set: updatedData }
+                );
+
+                if (result.matchedCount === 0) {
+                    return res.status(404).json({ message: "Destination not found" });
+                }
+
+                res.status(200).json(result);
+            } catch (error) {
+                console.error("Update error:", error);
+                res.status(500).json({ message: "Internal server error" });
+            }
+        });
 
 
     } catch (error) {
