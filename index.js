@@ -107,7 +107,7 @@ async function connectToMongoDB() {
                 });
             }
         });
-        
+
         // PATCH API : updating a destination
         app.patch("/study/:id", async (req, res) => {
             try {
@@ -133,6 +133,16 @@ async function connectToMongoDB() {
                 res.status(500).json({ message: "Internal server error" });
             }
         });
+
+        // Delete: deleting a study collection
+        app.delete("/study/:id", async (req, res) => {
+            const { id } = req.params;
+            const query = { _id: new ObjectId(id)};
+            const result = await roomCollection.deleteOne(query);
+            res.send(result);
+        });
+
+
 
 
     } catch (error) {
