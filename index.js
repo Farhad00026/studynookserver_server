@@ -5,6 +5,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { MongoClient, ObjectId } = require("mongodb");
+const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
+
 
 dotenv.config();
 
@@ -24,6 +26,32 @@ app.use(express.urlencoded({ extended: true }));
 // ===============================
 
 const client = new MongoClient(process.env.MONGO_URI);
+const JWKS = createRemoteJWKSet(
+    new URL(`${process.env.NEXT_CLIENT_SIDE_URI}/api/auth/jwks`)
+);
+
+// Fixed: correct casing, awaited jwtVerify, async middleware
+const verifyToken = async (req, res, next) => {
+    const authHeader = req?.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ message: "Authorization header missing" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ message: "Token missing" });
+    }
+
+    try {
+        const { payload } = await jwtVerify(token, JWKS);
+        req.user = payload; // available to downstream routes
+        console.log(payload);
+        next();
+    } catch (error) {
+        console.error("JWT verify error:", error.message);
+        return res.status(401).json({ message: "Invalid or expired token" });
+    }
+};
 
 let roomCollection;
 
@@ -39,7 +67,7 @@ async function connectToMongoDB() {
 
 
         //GET  api for LIMIT-6 study rooms
-        app.get("/study/limit", async (req, res) => {
+        app.get("/study/limit",async (req, res) => {
             try {
                 const rooms = await roomCollection.find().limit(6).toArray();
 
@@ -55,7 +83,7 @@ async function connectToMongoDB() {
         });
 
         //GET  api for all study 
-        app.get("/study", async (req, res) => {
+        app.get("/study",verifyToken,async (req, res) => {
             try {
                 const rooms = await roomCollection.find().toArray();
 
