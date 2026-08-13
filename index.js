@@ -138,7 +138,7 @@ async function connectToMongoDB() {
         // Delete: deleting a study collection
         app.delete("/study/:id", async (req, res) => {
             const { id } = req.params;
-            const query = { _id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await roomCollection.deleteOne(query);
             res.send(result);
         });
@@ -161,6 +161,44 @@ async function connectToMongoDB() {
                 });
             }
         });
+        //Get API for booking fetch:
+        app.get("/bookings/:id", async (req, res) => {
+            try {
+                const rooms = await bookedCollection.find().toArray();
+
+                res.status(200).send(rooms);
+            } catch (error) {
+                console.error("Error fetching rooms:", error);
+
+                res.status(500).send({
+                    success: false,
+                    message: "Failed to fetch study rooms",
+                });
+            }
+        });
+        //Delete api for Booked room
+        app.delete("/bookings/:id", async (req, res) => {
+            try {
+                const { id } = req.params;
+
+                if (!ObjectId.isValid(id)) {
+                    return res.status(400).send({ message: "Invalid booking ID" });
+                }
+
+                const query = { _id: new ObjectId(id) };
+                const result = await bookedCollection.deleteOne(query);
+
+                if (result.deletedCount === 0) {
+                    return res.status(404).send({ message: "Booking not found" });
+                }
+
+                res.send(result);
+            } catch (error) {
+                console.error("DELETE /bookings/:id error:", error);
+                res.status(500).send({ message: "Server error" });
+            }
+        });
+
 
 
 
