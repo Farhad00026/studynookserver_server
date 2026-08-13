@@ -142,6 +142,25 @@ async function connectToMongoDB() {
             const result = await roomCollection.deleteOne(query);
             res.send(result);
         });
+        //POST api for Booking Data
+        app.post("/bookings/:id", async (req, res) => {
+            try {
+                const dataRoom = req.body;
+                const result = await bookedCollection.insertOne(dataRoom);
+                res.status(201).send({
+                    success: true,
+                    message: "Study room added successfully",
+                    insertedId: result.insertedId,
+                });
+            } catch (error) {
+                console.error("Error adding room:", error);
+
+                res.status(500).send({
+                    success: false,
+                    message: "Failed to add study room",
+                });
+            }
+        });
 
 
 
