@@ -35,6 +35,7 @@ async function connectToMongoDB() {
 
         const db = client.db("studynook");
         const roomCollection = db.collection("studynookcollection");
+        const bookedCollection = db.collection("bookedstudycollection");
 
 
         //GET  api for LIMIT-6 study rooms
